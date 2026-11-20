@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bloom – Puberty Answers for Girls</title>
+  <meta name="description" content="A private, judgment-free place for girls ages 10–13 in Támesis, Antioquia, Colombia to learn about puberty.">
+  <!-- Privacy: ask browsers/search engines not to index or cache; no cookies, trackers, or storage are used. -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+
+  <style>
+    /* =========================================================
+       1. DESIGN TOKENS — change colours/fonts here only
+       ========================================================= */
+    :root {
+      /* Brand palette (darkest → lightest). Used sparingly: flat accents, borders and tints only. */
+      /* Cooler, bluer pinks than the original salmon-leaning set. Only rose-1/2 are strong:
+         use them for thin rules and borders, never for large fills. */
+      --rose-1:      #d9779b;
+      --rose-2:      #e79bb7;
+      --rose-3:      #f2bdd0;
+      --rose-4:      #f8d6e2;
+      --rose-5:      #fdeaf1;
+      /* Neutrals for readability: page background + deep rose-plum text */
+      --cream:       #fffafc;
+      --paper:       #ffffff;
+      --line:        #e79bb7;   /* borders: rose-2 */
+      --tint:        #fdeaf1;   /* rose-5 */
+      --ink:         #3b1520;   /* main text: ~15:1 on cream */
+      --ink-soft:    #6b2f3f;   /* secondary text: ~8:1 on cream */
+      --focus:       #3b1520;
+      --radius:      4px;       /* small radius: flat and restrained */
+      /* Serif headings and a plain system sans for body: sober, no web fonts to load */
+      --font-head:   Georgia, "Times New Roman", serif;
+      --font:        system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* =========================================================
+       2. BASE / RESET
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 120px; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--cream);
+    }
+    h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.25; margin: 0 0 .5em; }
+    p { margin: 0 0 1em; }
+    a { color: var(--ink); text-underline-offset: 3px; }
+    a:hover { color: var(--ink-soft); }
+    .container { width: min(1040px, 100% - 2rem); margin-inline: auto; }
+
+    /* Strong, visible keyboard focus for every interactive element */
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+    .skip-link {
+      position: absolute; left: -999px; top: 0; background: var(--ink); color: #fff;
+      padding: .6rem 1rem; z-index: 200;
+    }
+    .skip-link:focus { left: 0; }
+
+    .visually-hidden {
+      position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap;
+    }
+
+    /* =========================================================
+       3. DISCLAIMER BANNER (top of every page)
+       ========================================================= */
+    .disclaimer-banner {
+      background: var(--rose-3); color: var(--ink); font-size: .9rem; text-align: center;
+      padding: .55rem 1rem;
+    }
+    .disclaimer-banner a { color: var(--ink); font-weight: 700; }
+
+    /* =========================================================
+       4. HEADER + NAV + QUICK EXIT
+       ========================================================= */
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--cream);
+      border-bottom: 2px solid var(--rose-4);
+    }
+    .header-inner {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: .5rem 1rem; padding: .7rem 0;
+    }
+    .brand { display: flex; flex-direction: column; text-decoration: none; }
+    .brand-title { font-family: var(--font-head); font-size: 1.5rem; font-weight: 600; }
+    .brand-title span { color: var(--rose-1); }
+    .brand-tagline { font-size: .875rem; color: var(--ink-soft); }
+
+    .nav-list { display: flex; flex-wrap: wrap; gap: .25rem; list-style: none; margin: 0; padding: 0; }
+    .nav-list a {
+      display: block; padding: .5rem .8rem; text-decoration: none; font-weight: 600; font-size: .95rem;
+      border-bottom: 2px solid transparent;
+    }
+    .nav-list a:hover { border-bottom-color: var(--rose-1); }
+
+    /* Quick Exit — always visible, high contrast, big tap target */
+    .quick-exit {
+      font: inherit; font-weight: 700; font-size: .95rem; cursor: pointer;
+      background: var(--ink); color: #fff; border: 0; border-radius: var(--radius);
+      padding: .65rem 1.1rem; min-height: 44px;
+    }
+    .quick-exit:hover { background: var(--ink-soft); }
+    /* On phones, pin it to the corner so it never scrolls out of reach */
+    @media (max-width: 720px) {
+      .quick-exit { position: fixed; right: 12px; bottom: 12px; z-index: 300; box-shadow: 0 2px 8px rgba(59, 21, 32, .3); }
+    }
+
+    /* =========================================================
+       5. HERO + SEARCH
+       ========================================================= */
+    .hero {
+      background: var(--rose-4);
+      border-bottom: 2px solid var(--rose-2);
+      padding: clamp(2.5rem, 7vw, 4.5rem) 0;
+    }
+    .hero h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); max-width: 22ch; }
+    .hero p.lead { font-size: 1.125rem; max-width: 38rem; }
+
+    .search-wrap { max-width: 32rem; margin: 1.75rem 0 0; }
+    .search-wrap input {
+      width: 100%; font: inherit; color: var(--ink);
+      padding: .8rem 1rem; border-radius: var(--radius); border: 1px solid var(--ink-soft);
+      background: #fff;
+    }
+    .search-wrap input:focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .search-hint { font-size: .875rem; color: var(--ink-soft); margin-top: .6rem; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+    .chip {
+      font: inherit; font-weight: 600; font-size: .9rem; cursor: pointer;
+      background: #fff; color: var(--ink); border: 1px solid var(--ink-soft);
+      border-radius: var(--radius); padding: .35rem .9rem;
+    }
+    .chip:hover { background: var(--rose-4); }
+    .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    /* =========================================================
+       6. SECTIONS
+       ========================================================= */
+    section.block { padding: clamp(2.5rem, 6vw, 4rem) 0; }
+    .section-head { max-width: 40rem; margin: 0 0 2rem; }
+    .section-head h2 { font-size: clamp(1.5rem, 4vw, 2rem); }
+    .no-results {
+      padding: 1rem 1.25rem; background: var(--tint); border-left: 4px solid var(--rose-1); margin-top: 1rem;
+    }
+
+    /* =========================================================
+       7. CATEGORY CARDS (grid, each expands to reveal content)
+       Flat white panels with a thin rose rule on the left; no shadows or hover motion.
+       ========================================================= */
+    .card-grid {
+      display: grid; gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+      align-items: start;
+    }
+    .card {
+      background: var(--rose-5); border: 1px solid var(--rose-2); border-left: 4px solid var(--rose-1);
+      border-radius: var(--radius);
+    }
+    /* Alternate two pale pinks so the grid has rhythm without heavy colour */
+    .card:nth-child(2), .card:nth-child(5) { background: var(--rose-4); }
+    .card:nth-child(3) { background: var(--rose-4); }
+    .card[hidden] { display: none; }
+    .card-toggle {
+      all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 1.25rem;
+    }
+    .card-toggle:hover h3 { text-decoration: underline; text-underline-offset: 4px; }
+    .card-toggle:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+    .card h3 { font-size: 1.2rem; margin-bottom: .35rem; }
+    .card-blurb { color: var(--ink); margin: 0 0 .75rem; font-size: .95rem; }
+    .card-more { font-weight: 700; font-size: .9rem; }
+    .card-more::after { content: " +"; }
+    .card-toggle[aria-expanded="true"] .card-more::after { content: " \2212"; }
+    .card-panel { padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--rose-2); background: rgba(255,255,255,.6); }
+    .card-panel[hidden] { display: none; }
+    .card-panel > :first-child { margin-top: 1.1rem; }
+
+    /* Placeholder styling so the team can spot unfinished content */
+    .placeholder {
+      border: 1px dashed var(--ink-soft); padding: .9rem 1rem;
+      background: rgba(255,255,255,.7); font-size: .95rem;
+    }
+
+    /* Long-form guide inside a card panel (Hormones card): readable measure, responsive images and videos */
+    .guide h4 { font-family: var(--font-head); font-size: 1.15rem; margin: 1.75rem 0 .6rem; }
+    .guide ul { padding-left: 1.2rem; margin: 0 0 1em; }
+    .guide li { margin-bottom: .6rem; }
+    /* Items start with their own emoji, so drop the bullet and the indent */
+    .guide ul.emoji-list { list-style: none; padding-left: 0; }
+    .guide hr { border: 0; border-top: 1px solid var(--rose-2); margin: 1.5rem 0; }
+    .guide img { display: block; max-width: 100%; height: auto; margin: 1.25rem auto; border-radius: var(--radius); }
+    /* 16:9 box so the YouTube iframe scales with the card width */
+    .video-wrap { position: relative; aspect-ratio: 16 / 9; margin: 1.25rem 0; background: var(--ink); }
+    .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    /* =========================================================
+       8. FAQ ACCORDION
+       ========================================================= */
+    .faq { background: var(--rose-5); border-top: 2px solid var(--rose-3); }
+    .accordion { max-width: 48rem; display: grid; gap: .5rem; }
+    .acc-item { background: #fff; border: 1px solid var(--rose-2); border-radius: var(--radius); overflow: hidden; }
+    .acc-item[hidden] { display: none; }
+    .acc-button {
+      all: unset; box-sizing: border-box; cursor: pointer; width: 100%;
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+      padding: 1rem 1.25rem; font-weight: 600;
+    }
+    .acc-button:hover { background: var(--rose-5); }
+    .acc-button:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+    /* Plus icon rotates into an "x" when open */
+    .acc-icon { flex: none; font-size: 1.4rem; line-height: 1; transition: transform .2s; }
+    .acc-button[aria-expanded="true"] .acc-icon { transform: rotate(45deg); }
+    /* Smooth open/close via grid-rows trick (no fixed heights needed) */
+    .acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .25s ease; }
+    .acc-panel.open { grid-template-rows: 1fr; }
+    .acc-panel > div { overflow: hidden; }
+    .acc-body { padding: 0 1.25rem 1.1rem; }
+    .expert-tag {
+      display: inline-block; font-size: .85rem; color: var(--ink);
+      border-top: 1px solid var(--rose-1); padding-top: .4rem; margin-top: .25rem;
+    }
+
+    /* =========================================================
+       9. FOOTER: HELP, DISCLAIMER, FEEDBACK
+       Dark plum with light text; links are underlined so they don't rely on colour alone.
+       ========================================================= */
+    .site-footer { background: var(--rose-3); color: var(--ink); padding: 3rem 0 5rem; }
+    .site-footer h2, .site-footer h3 { color: var(--ink); font-size: 1.4rem; }
+    .site-footer a { color: var(--ink); font-weight: 700; }
+    .footer-grid { display: grid; gap: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+    .help-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+    .help-list li { border-top: 1px solid rgba(59,21,32,.35); padding: .8rem 0; }
+    .help-list li:last-child { border-bottom: 1px solid rgba(59,21,32,.35); }
+    .help-list strong { display: block; }
+
+    .feedback-form label { display: block; font-weight: 700; margin-bottom: .35rem; }
+    .feedback-form textarea {
+      width: 100%; min-height: 110px; font: inherit; padding: .8rem; border-radius: var(--radius);
+      border: 1px solid transparent; resize: vertical; color: var(--ink);
+    }
+    .feedback-form textarea:focus { outline: 3px solid var(--ink); outline-offset: 2px; }
+    .btn {
+      font: inherit; font-weight: 700; cursor: pointer; margin-top: .75rem;
+      background: var(--ink); color: #fff; border: 0; border-radius: var(--radius);
+      padding: .7rem 1.4rem; min-height: 44px;
+    }
+    .btn:hover { background: var(--ink-soft); }
+    .form-status { margin-top: .75rem; min-height: 1.5em; }
+    .fine-print { font-size: .875rem; border-top: 1px solid rgba(59,21,32,.35); margin-top: 2.5rem; padding-top: 1.25rem; }
+
+    /* Respect users who prefer less motion */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- ========== DISCLAIMER BANNER ========== -->
+  <div class="disclaimer-banner" role="note">
+    This site is for <strong>information only</strong> and does not replace advice from a doctor or nurse.
+    If something worries you, talk to a trusted adult. <a href="#help">Get help</a>
+  </div>
+
+  <!-- ========== HEADER ========== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Bloom home">
+        <!-- INSERT Final Site Name HERE -->
+        <span class="brand-title">Bloom<span aria-hidden="true">.</span></span>
+        <!-- INSERT Final Tagline HERE -->
+        <span class="brand-tagline">Real answers. No judgment. Just for you.</span>
+      </a>
+
+      <nav aria-label="Main navigation">
+        <ul class="nav-list">
+          <li><a href="#topics">Topics</a></li>
+          <li><a href="#ask">Ask an Expert</a></li>
+          <li><a href="#help">Help &amp; Resources</a></li>
+          <li><a href="#feedback">Feedback</a></li>
+        </ul>
+      </nav>
+
+      <!-- Quick Exit: also triggered by pressing Escape twice -->
+      <button type="button" class="quick-exit" id="quickExit" aria-label="Quick exit: leave this page immediately">
+        Quick Exit
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ========== HERO ========== -->
+    <div class="hero" id="top">
+      <div class="container">
+        <h1>Your body is changing. That’s normal.</h1>
+        <p class="lead">
+          Everyone goes through puberty, and everyone’s timing is different. Whatever you’re feeling or wondering,
+          you’re not weird, and you’re not alone. Ask anything here, privately.
+        </p>
+
+        <!-- Search + filter: filters the topic cards and FAQ questions live -->
+        <div class="search-wrap" role="search">
+          <label for="search" class="visually-hidden">Search topics and questions</label>
+          <input type="search" id="search" placeholder="Search a topic… (try “periods” or “friends”)"
+                 autocomplete="off" spellcheck="false">
+          <p class="search-hint">Nothing you type here is saved or sent anywhere.</p>
+        </div>
+
+        <div class="chips" role="group" aria-label="Filter by topic">
+          <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="chip" data-filter="body" aria-pressed="false">Body</button>
+          <button type="button" class="chip" data-filter="confidence" aria-pressed="false">Confidence</button>
+          <button type="button" class="chip" data-filter="social" aria-pressed="false">Social</button>
+          <button type="button" class="chip" data-filter="feelings" aria-pressed="false">Feelings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CATEGORY GRID ========== -->
+    <section class="block" id="topics" aria-labelledby="topics-h">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="topics-h">What do you want to know about?</h2>
+          <p>Tap a card to open it. Take your time, and read only what you want.</p>
+        </div>
+
+        <div class="card-grid" id="cardGrid">
+
+          <!-- Each card: data-cat = filter chip, data-keywords = extra search words -->
+          <article class="card" data-cat="body" data-keywords="periods growth breasts hair acne hormones puberty skin">
+            <button class="card-toggle" aria-expanded="false" aria-controls="panel-hormones">
+              <h3>Hormones &amp; Physical Changes</h3>
+              <p class="card-blurb">Periods, growth spurts, skin, and what’s happening inside.</p>
+              <span class="card-more">Read more</span>
+            </button>
+            <div class="card-panel" id="panel-hormones" hidden>
+              <!-- Guide text copied from the Google Doc "El viaje de la pubertad" (Spanish, emojis kept on purpose).
+                   lang="es" so screen readers use Spanish pronunciation inside an English page. -->
+              <div class="guide" lang="es">
+                <p><strong>Guia oficial de tu cuerpo:</strong> El viaje de la Pubertad</p>
+
+                <p>¡Hola! Estás entrando a una de las etapas más emocionantes de tu vida. Tu cuerpo y tu mente están empezando a transformarse para dar el paso de la niñez a la adolescencia. A este proceso lo llamamos <strong>pubertad</strong>. No pasa de la noche a la mañana, es un viaje lleno de sorpresas y aquí te contamos todo lo que necesitas saber.</p>
+
+                <img src="images/hormonas-0-antes-despues.png" alt="Dos ilustraciones de una niña: a la izquierda de niña pequeña con trenzas, a la derecha ya adolescente con el pelo suelto." loading="lazy">
+
+                <hr>
+
+                <h4>1. ¿Quién manda aquí? Los Cambios Hormonales</h4>
+                <ul>
+                  <li><strong>El centro de mando:</strong> Imagina que tu cuerpo tiene su propio centro de control. Un buen día, una pequeña parte de tu cerebro llamada <strong>hipófisis</strong> decide que ha llegado el momento de crecer y activa el plan de desarrollo enviando unos mensajeros especiales llamados <strong>hormonas</strong>.</li>
+                  <li><strong>Estrógenos y progesterona:</strong> Estos son los dos tipos de hormonas principales y más importantes en el cuerpo de las niñas durante esta etapa.</li>
+                </ul>
+                <p>🚀 <strong>Su gran misión:</strong> Viajan a través del torrente sanguíneo transportando instrucciones precisas. Su trabajo es darle la orden directa a tus ovarios, a tu piel y a tus huesos de iniciar los cambios necesarios para transformarte, poco a poco, en una mujer joven.</p>
+
+                <img src="images/hormonas-1-centro-de-control.png" alt="Ilustración titulada «Tu cuerpo: el centro de control»: el cerebro con el hipotálamo y la hipófisis envía estrógenos y progesterona, a través de un panel de control hormonal, hacia los ovarios, la piel y los huesos." loading="lazy">
+
+                <h4>🗺️ 2. Cambios Anatómicos: Tu Nueva Silueta</h4>
+                <p>Tu cuerpo va a empezar a verse y sentirse diferente. Estos son los cambios físicos más comunes y son completamente normales:</p>
+                <ul class="emoji-list">
+                  <li>👚 El "botón" mamario: El pecho empieza a crecer de forma gradual. Al principio, es completamente normal que sientas un pequeño bultito tierno, firme o un poco sensible justo debajo del pezón.</li>
+                  <li>📐 Curvas y estatura: Tus caderas se volverán ligeramente más anchas y redondeadas. Además, experimentarás el famoso "estirón", una etapa de crecimiento rápido donde ganarás altura en poco tiempo.</li>
+                  <li>🌱 Vello corporal: Comenzará a aparecer vello nuevo en las axilas y en el pubis (tu zona íntima). Notarás que al principio es muy delgado y claro, pero con el tiempo se volverá un poco más grueso y oscuro.</li>
+                  <li>✨ Tu piel y el sudor: Tus glándulas se vuelven mucho más activas, produciendo más grasita y sudor. Debido a esto, es probable que aparezcan algunos granitos (acné) en el rostro o la espalda, y notarás que tu sudor ahora tiene un olor más maduro y fuerte.</li>
+                </ul>
+
+                <img src="images/hormonas-2-cambios-anatomicos.png" alt="Infografía «Tu cuerpo: los cambios anatómicos de la pubertad» con cuatro recuadros alrededor de una niña: desarrollo mamario, crecimiento y curvas, vello corporal y cambios en la piel." loading="lazy">
+
+                <h4>🔄 3. Ovulación y Menstruación: El Ciclo de la Vida</h4>
+                <p>Dentro de tu abdomen tienes dos ovarios que guardan miles de óvulos (pequeñas células parecidas a huevitos).</p>
+                <p><strong>El Ciclo Menstrual Paso a Paso</strong></p>
+                <ul class="emoji-list">
+                  <li>🥚 La Ovulación (El inicio del viaje): Una vez al mes, tus hormonas hacen que un óvulo madure y salga del ovario. Esta pequeña célula viaja a través de un conducto llamado trompa de Falopio con dirección hacia el útero o matriz.</li>
+                  <li>🪺 La "cunita" del útero (La preparación): Mientras el óvulo va en camino, el útero se prepara de forma natural cubriendo sus paredes internas con una capa suave, acolchada y protectora llena de sangre y nutrientes esenciales.</li>
+                  <li>🩸 La Menstruación (Tus días): Si el óvulo no es fertilizado, el cuerpo nota que no necesitará esa protección. Por lo tanto, el útero se deshace de ese tejido suave, el cual se libera hacia el exterior a través de la vagina en forma de un sangrado ligero.</li>
+                  <li>📅 Duración y regularidad: A este proceso lo llamamos período, menstruación o regla. Lo habitual es que el sangrado dure entre 3 y 7 días y ocurra aproximadamente cada 28 días, aunque en algunas mujeres este ciclo puede variar de forma completamente normal entre los 21 y los 35 días.</li>
+                </ul>
+
+                <!-- Videos: youtube-nocookie avoids YouTube cookies until the video is played.
+                     referrerpolicy is set on the iframe because the page-wide "no-referrer" meta makes
+                     YouTube refuse to play embeds (error 153). Panel is hidden at first, so lazy iframes
+                     only load once the card is opened. -->
+                <div class="video-wrap">
+                  <iframe src="https://www.youtube-nocookie.com/embed/fHV8cv_mRB8?start=8" title="Video 1: el ciclo menstrual" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+                </div>
+                <div class="video-wrap">
+                  <iframe src="https://www.youtube-nocookie.com/embed/vTh-WSpjM4w" title="Video 2: el ciclo menstrual" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+                </div>
+
+                <hr>
+
+                <h4>🎭 4. Cambios en el Comportamiento: Una Montaña Rusa Emocional</h4>
+                <p>Las hormonas no solo cambian tu cuerpo, también afectan cómo te sientes. Es normal experimentar:</p>
+                <ul class="emoji-list">
+                  <li>🌦️ Cambios de humor: "Es completamente natural experimentar emociones muy intensas en poco tiempo. Pasar de la risa al llanto o al enojo en pocos minutos es solo una señal de que tu cerebro se está adaptando a las hormonas."</li>
+                  <li>📓 Deseo de privacidad: "Sentirás más necesidad de pasar tiempo a solas en tu habitación, escribir un diario privado o proteger tus secretos. Es un paso saludable y natural hacia tu propia independencia."</li>
+                  <li>👭 Nuevas amistades: "Tus amigas y amigos se vuelven un pilar fundamental. Buscarás relacionarte con personas que compartan tus mismos gustos, pasatiempos y formas de ver el mundo."</li>
+                  <li>🪞 Preguntas e identidad: "Comenzarás a cuestionarte más sobre quién eres, qué cosas te apasionan y cuál es tu lugar en el mundo. Estás descubriendo y moldeando tu propia personalidad.</li>
+                </ul>
+
+                <img src="images/hormonas-4-comportamiento.png" alt="Ilustración de una adolescente rodeada de iconos: cambios de humor, deseo de privacidad, nuevas amistades, desarrollo cerebral, crecimiento emocional, preguntas e identidad y hormonas acomodándose." loading="lazy">
+
+                <hr>
+
+                <!-- Section 5 comes from a second Google Doc ("Recomendaciones para esta etapa"),
+                     appended to the same Hormones guide because it continues the numbering 1-4 above. -->
+                <h4>🌟 5. Tus Súper Recomendaciones para esta Etapa</h4>
+                <p>Para que vivas este viaje con total confianza, toma en cuenta estos consejos:</p>
+                <ul class="emoji-list">
+                  <li>🧼 1. Higiene diaria: Báñate todos los días y adopta el uso de un desodorante suave. No olvides lavar tu rostro por las mañanas y por las noches con agua y jabón neutro para mantener tu piel limpia y libre de grasa.</li>
+                  <li>🎒 2. Tu kit menstrual de emergencia: Prepara un estuche o una cartera para llevar siempre en tu mochila escolar. Incluye toallas higiénicas o pantiprotectores para que ningún cambio imprevisto te tome por sorpresa fuera de casa.</li>
+                  <li>👚 3. Ropa cómoda para el día a día: Durante el crecimiento, el pecho se vuelve muy sensible. Usar un top deportivo o un brasier suave fabricado de algodón te dará todo el soporte necesario sin lastimarte ni apretar.</li>
+                  <li>🗣️ 4. Habla sin miedo ni vergüenza: Sentir dudas, temores o tristeza es parte del proceso. Comparte todo lo que experimentas con tu mamá, tu papá, una tía o un médico de confianza; recuerda que ellos ya recorrieron este mismo camino</li>
+                </ul>
+
+                <img src="images/hormonas-5-recomendaciones.png" alt="Ilustración «Tus súper recomendaciones para esta etapa»: 1. higiene diaria (jabón, agua y desodorante), 2. kit menstrual (cartera con toallas higiénicas y mochila), 3. ropa cómoda (top de algodón), 4. habla sin miedo (una adolescente conversando con una mujer adulta)." loading="lazy">
+
+                <!-- Signature exactly as in the source doc; this is the only expert credit on the card -->
+                <p class="expert-tag">
+                  Guadalupe Posada Estrada<br>
+                  Ginecóloga<br>
+                  Magister Epidemiología<br>
+                  Colposcopia y Patología cervical<br>
+                  UPB. CES.FUCS
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="card" data-cat="confidence" data-keywords="self esteem body image confidence love myself comparison">
+            <button class="card-toggle" aria-expanded="false" aria-controls="panel-esteem">
+              <h3>Self-Esteem &amp; Body Confidence</h3>
+              <p class="card-blurb">Feeling good in your own skin, one day at a time.</p>
+              <span class="card-more">Read more</span>
+            </button>
+            <div class="card-panel" id="panel-esteem" hidden>
+              <div class="placeholder">
+                <!-- INSERT Survey-Based Content for Self-Esteem HERE -->
+                <!-- INSERT Expert Insight for Self-Esteem HERE -->
+                <strong>Placeholder:</strong> Survey-based content and expert insight for Self-Esteem &amp; Body Confidence.
+              </div>
+            </div>
+          </article>
+
+          <article class="card" data-cat="social" data-keywords="social media instagram tiktok influencers filters photos beauty comparison online">
+            <button class="card-toggle" aria-expanded="false" aria-controls="panel-social">
+              <h3>Beauty standards</h3>
+              <p class="card-blurb">What’s real, what’s filtered, and how to scroll smart.</p>
+              <span class="card-more">Read more</span>
+            </button>
+            <div class="card-panel" id="panel-social" hidden>
+              <div class="placeholder">
+                <!-- INSERT Survey-Based Content for Social Media HERE -->
+                <!-- INSERT Expert Insight for Social Media HERE -->
+                <strong>Placeholder:</strong> Survey-based content and expert insight for Beauty standards.
+              </div>
+            </div>
+          </article>
+
+          <article class="card" data-cat="social" data-keywords="drugs alcohol drinking vaping smoking party peer pressure saying no">
+            <button class="card-toggle" aria-expanded="false" aria-controls="panel-boundaries">
+              <h3>Drug and alcohol consumption</h3>
+              <p class="card-blurb">What to know, how to say no, and where to get help.</p>
+              <span class="card-more">Read more</span>
+            </button>
+            <div class="card-panel" id="panel-boundaries" hidden>
+              <div class="placeholder">
+                <!-- INSERT Survey-Based Content for Drug and Alcohol Consumption HERE -->
+                <!-- INSERT Expert Insight for Drug and Alcohol Consumption HERE -->
+                <strong>Placeholder:</strong> Survey-based content and expert insight for Drug and alcohol consumption.
+              </div>
+            </div>
+          </article>
+
+          <article class="card" data-cat="feelings" data-keywords="friends crush dating boundaries consent respect rejection bullying mental health emotions">
+            <button class="card-toggle" aria-expanded="false" aria-controls="panel-feelings">
+              <h3>Healthy relationships</h3>
+              <p class="card-blurb">Friends, crushes, respect, consent, and when to ask for help.</p>
+              <span class="card-more">Read more</span>
+            </button>
+            <div class="card-panel" id="panel-feelings" hidden>
+              <!-- Text copied from the Google Doc "Managing Emotions" (English, no images or videos in the source).
+                   Reuses the .guide styles defined for the Hormones card. -->
+              <div class="guide">
+                <p><strong>Managing Emotions</strong></p>
+
+                <p>We all feel intense emotions at times - this is normal. However, if we don’t have healthy ways to manage these emotions, they can start to harm our behaviour and relationships. In the short term, not managing our emotions can increase our risk of anxiety and withdrawal, and lead to difficulties controlling our behaviour. In the long term, we may experience more conflict and relationship breakdowns, and we could be more at risk of depression and other mental health conditions.<sup>1</sup> So, it’s important to understand and manage our emotions, so we can feel good in our relationships and within ourselves.</p>
+
+                <p>Noticing your emotions as you’re feeling them is an important first step to understanding them. From there, you can choose how you want to react. You can start to notice your emotions by checking in with yourself throughout the day. Try writing down how you’re feeling on a piece of paper, on a note on your phone or in a journal.</p>
+
+                <p>Naming your feelings may sound similar to noticing them, but the act of naming them can help in two main way</p>
+
+                <p>1. When you speak your feelings out loud, your brain automatically begins to reevaluate the situation that triggered those feelings. This process, known as cognitive reappraisal, can make the situation feel less upsetting.</p>
+                <p>2. Voicing your feelings acknowledges them, which brings acceptance. It also acts as a reminder that emotions aren’t permanent and can be noticed and let go of.</p>
+                <p>3. Naming your feelings could be as simple as saying, “I’m feeling tired and grumpy today, but a little excited for this evening.” You could set yourself the goal of naming your feelings to your spouse, friends or family members once a day. Alternatively, if sharing your emotions with others feels too much right now, you can practice telling yourself in the mirror.</p>
+
+                <p>When we’re in a situation that triggers intense emotions, we get a physical reaction. This physical reaction can indicate that someone has overstepped our boundaries or that something they said or did reminded us of a painful past experience. One way to identify your triggers is to concentrate on your body. Here are some signs that you may be feeling emotionally triggered:</p>
+                <ul>
+                  <li>Sweating</li>
+                  <li>Rapid heart rate</li>
+                  <li>Panic or anxiety attack</li>
+                  <li>Finding it difficult to breathe</li>
+                  <li>Sudden changes in your mood</li>
+                  <li>Tension in your muscles, jaw, or fists</li>
+                  <li>Experiencing a series of negative thoughts</li>
+                  <li>Feeling panicky, scared, or generally unsafe</li>
+                  <li>Experiencing a sudden urge to escape or run away.</li>
+                </ul>
+
+                <h4>Addressing difficult but common emotions</h4>
+
+                <p>1 Anxiety</p>
+                <p>What it is. Anxiety is an internal reaction to stress that can happen even if there is no specific situation or immediate threat. It may be described as excessive worry or fear that doesn’t go away.</p>
+                <p>How to manage it. Learning what causes or triggers your anxiety and what coping techniques work for you can help reduce your anxiety and improve your daily life.</p>
+
+                <p>2. Anger</p>
+                <p>What it is. Anger is an intense emotional reaction we may have to something that upsets us, seems unfair, or is threatening. It can come out as verbal outbursts or aggressive behavior. Feelings of frustration, sadness, worry, or being overwhelmed can also come out as anger.</p>
+                <p>How to manage it. Learning healthy ways to express or resolve anger can help your sense of well-being and your relationships. You can learn anger management or assertive communication techniques that can help you cope with anger in healthy ways. These techniques can help you express your feelings or opinions in a clear, respectful, and constructive way.</p>
+
+                <p>3. Sadness</p>
+                <p>What it is. Being sad is a normal reaction to disappointing events or life changes. But prolonged feelings of sadness could be a sign of depression.</p>
+                <p>How to manage it. CDC offers tips to help deal with sadness and depression, including how to know if your sadness might be depression. Seeking support from loved ones or mental health professionals can help you work through sadness.</p>
+
+                <p>4. Fear</p>
+                <p>What it is. Fear is a normal reaction that can be triggered by events, people, circumstances, or memories. We may also experience it when we face unknown or uncertain situations.</p>
+                <p>How to manage it. Identifying and challenging your fears through cognitive-behavioral therapy can help you manage fear and promote emotional well-being.</p>
+
+                <p>5. Loneliness</p>
+                <p>What it is. Loneliness is feeling like you do not have meaningful or close relationships or a sense of belonging. It can negatively affect your emotional well-being and overall health.</p>
+                <p>How to manage it. Building social connections through group activities, such as joining clubs or groups with shared interests, or seeking support from friends and family members can help combat loneliness.</p>
+
+                <p>6. Grief</p>
+                <p>What it is. Grief is a natural response to loss, whether it's the death of a loved one, the end of a relationship, or any significant loss.</p>
+                <p>How to manage it. You can work through the healing process by allowing yourself time to grieve, seeking support from friends or family, or seeking grief counseling.</p>
+
+                <p>Emotions are important because they help us communicate with others, motivate us to action, and validate our experiences. They also strongly color how we see the world. The process of understanding and constructively expressing emotions (and not letting them control you) is key to building healthy relationships and a fulfilling life.</p>
+
+                <p>Some things to keep in mind about emotions:</p>
+                <ul>
+                  <li>Emotions themselves aren’t positive or negative, but more like “data” in your life. Accept all your emotions as natural and understandable.</li>
+                  <li>Your feelings may be mild, intense, or anywhere in-between.</li>
+                  <li>You can’t turn emotions on and off. Feelings come and go whether you want them to or not. It is often better to accept that and whatever you’re feeling rather than fighting it.</li>
+                  <li>You aren’t your emotions. You have a choice to act differently than what your initial reaction to an emotion compels you to. We can’t choose our emotions, but we can choose our response to them.</li>
+                  <li>Remember that even if your current emotions feel unbearable, they will pass. Remind yourself that you won’t always feel this way. It’s important to deal with painful emotions rather than self-medicate or ignore them.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <!-- TEMPLATE: copy a card above to add a new topic. -->
+        </div>
+
+        <p class="no-results" id="noResults" hidden role="status">
+          Hmm, nothing matched that. Try a different word, or check the <a href="#ask">Ask an Expert</a> section.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========== ASK AN EXPERT / FAQ ========== -->
+    <section class="block faq" id="ask" aria-labelledby="ask-h">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="ask-h">Ask an Expert</h2>
+          <p>Real questions, answered by volunteer experts. Tap a question to see the answer.</p>
+        </div>
+
+        <div class="accordion" id="accordion">
+          <!-- Each .acc-item is one Q&A. Copy the block to add more. -->
+          <div class="acc-item" data-keywords="period first menstruation when">
+            <h3 style="margin:0">
+              <button class="acc-button" aria-expanded="false" aria-controls="ans-1" id="q-1">
+                <span>When will I get my first period?</span><span class="acc-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="acc-panel" id="ans-1" role="region" aria-labelledby="q-1">
+              <div><div class="acc-body">
+                <!-- INSERT Expert Answer #1 HERE -->
+                <p>Sample answer: There’s a wide range of “normal.” Most people get their first period between about 9 and 15.</p>
+                <span class="expert-tag">Reviewed by: [Expert Name, Credentials]</span>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="acc-item" data-keywords="mood swings emotions crying angry">
+            <h3 style="margin:0">
+              <button class="acc-button" aria-expanded="false" aria-controls="ans-2" id="q-2">
+                <span>Why do my feelings change so fast?</span><span class="acc-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="acc-panel" id="ans-2" role="region" aria-labelledby="q-2">
+              <div><div class="acc-body">
+                <!-- INSERT Expert Answer #2 HERE -->
+                <p>Sample answer: Hormones can make emotions feel bigger and quicker. It’s common, and there are things that help.</p>
+                <span class="expert-tag">Reviewed by: [Expert Name, Credentials]</span>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="acc-item" data-keywords="friends rejection left out">
+            <h3 style="margin:0">
+              <button class="acc-button" aria-expanded="false" aria-controls="ans-3" id="q-3">
+                <span>What if my friends are changing faster (or slower) than me?</span><span class="acc-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="acc-panel" id="ans-3" role="region" aria-labelledby="q-3">
+              <div><div class="acc-body">
+                <!-- INSERT Expert Answer #3 HERE -->
+                <p>Sample answer: Everyone’s body has its own schedule, and it’s not a race.</p>
+                <span class="expert-tag">Reviewed by: [Expert Name, Credentials]</span>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="acc-item" data-keywords="social media filters influencers body image">
+            <h3 style="margin:0">
+              <button class="acc-button" aria-expanded="false" aria-controls="ans-4" id="q-4">
+                <span>Why do people online look “perfect”?</span><span class="acc-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="acc-panel" id="ans-4" role="region" aria-labelledby="q-4">
+              <div><div class="acc-body">
+                <!-- INSERT Expert Answer #4 HERE -->
+                <p>Sample answer: Filters, editing, lighting, and posing are used a lot. What you see is a highlight reel.</p>
+                <span class="expert-tag">Reviewed by: [Expert Name, Credentials]</span>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="acc-item" data-keywords="boundaries say no uncomfortable trusted adult">
+            <h3 style="margin:0">
+              <button class="acc-button" aria-expanded="false" aria-controls="ans-5" id="q-5">
+                <span>How do I say “no” without feeling mean?</span><span class="acc-icon" aria-hidden="true">+</span>
+              </button>
+            </h3>
+            <div class="acc-panel" id="ans-5" role="region" aria-labelledby="q-5">
+              <div><div class="acc-body">
+                <!-- INSERT Expert Answer #5 HERE -->
+                <p>Sample answer: You’re allowed to have limits. Saying “no thanks” is polite and enough.</p>
+                <span class="expert-tag">Reviewed by: [Expert Name, Credentials]</span>
+              </div></div>
+            </div>
+          </div>
+        </div>
+        <p class="no-results" id="noFaq" hidden role="status">No matching questions yet. Use the feedback form below to suggest one!</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+
+        <section id="help" aria-labelledby="help-h">
+          <h2 id="help-h">Help &amp; Resources</h2>
+          <p>Need to talk to someone right now? These are free and private.</p>
+          <!-- VERIFY all numbers before launch (Colombia). Add Támesis / Antioquia local contacts below. -->
+          <ul class="help-list">
+            <li><strong>Línea 123 – Emergencias (Colombia)</strong> Call <a href="tel:123">123</a>, 24/7</li>
+            <li><strong>Línea 141 – ICBF, protección de niñas, niños y adolescentes</strong> Call <a href="tel:141">141</a>, free, 24/7</li>
+            <li><strong>Línea 155 – Orientación a mujeres víctimas de violencia</strong> Call <a href="tel:155">155</a>, free, 24/7</li>
+            <li><strong>Línea 192, opción 4 – Salud mental (Ministerio de Salud)</strong> Call <a href="tel:192">192</a> and press 4</li>
+            <li><strong>Somewhere else?</strong> <a href="https://findahelpline.com/co" rel="noopener noreferrer" target="_blank">findahelpline.com</a> lists free helplines for Colombia.</li>
+          <!-- INSERT Additional Local Resources HERE -->
+          </ul>
+          <p style="margin-top:1rem"><strong>In an emergency, call 123 (Colombia’s national emergency number).</strong></p>
+        </section>
+
+        <section id="feedback" aria-labelledby="fb-h">
+          <h2 id="fb-h">Anonymous Feedback</h2>
+          <p>Tell us what helped, what’s missing, or a question you want answered. We never ask for your name or email.</p>
+          <form class="feedback-form" id="feedbackForm">
+            <label for="fbText">Your message</label>
+            <textarea id="fbText" name="message" maxlength="1000" required
+                      placeholder="Don’t include your name, school, or other personal details."></textarea>
+            <button class="btn" type="submit">Send anonymously</button>
+            <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+      </div>
+
+      <div class="fine-print">
+        <!-- INSERT Final Legal / Medical Disclaimer HERE (have counsel review) -->
+        <p><strong>Medical disclaimer:</strong> The content on this site is for general educational purposes only. It is not
+          medical advice and is not a substitute for diagnosis or treatment by a qualified health professional.
+          Always ask a doctor, nurse, parent, or another trusted adult about health concerns.</p>
+        <p><strong>Privacy:</strong> This site does not use cookies, accounts, or tracking. Tip: use a private/incognito window,
+          and use Quick Exit (or press Esc twice) if you need to leave quickly.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================
+       JAVASCRIPT — vanilla, no dependencies, no storage, no tracking
+       ========================================================= */
+
+    /* ---------- 1. QUICK EXIT ----------
+       Replaces the current history entry (so Back doesn't return here)
+       and jumps to a neutral site. Change EXIT_URL if desired. */
+    const EXIT_URL = "https://www.google.com.co";
+    function quickExit() {
+      window.open(EXIT_URL, "_blank", "noopener"); // open decoy in a new tab (may be blocked; fallback below)
+      window.location.replace(EXIT_URL);           // and replace this tab so Back can't return
+    }
+    document.getElementById("quickExit").addEventListener("click", quickExit);
+
+    // Press Escape twice within 1 second to exit from the keyboard.
+    let lastEsc = 0;
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const now = Date.now();
+      if (now - lastEsc < 1000) quickExit();
+      lastEsc = now;
+    });
+
+    /* ---------- 2. CARD EXPAND/COLLAPSE ---------- */
+    document.querySelectorAll(".card-toggle").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const panel = document.getElementById(btn.getAttribute("aria-controls"));
+        const open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!open));
+        panel.hidden = open;
+        btn.querySelector(".card-more").textContent = open ? "Read more" : "Show less";
+      });
+    });
+
+    /* ---------- 3. FAQ ACCORDION ---------- */
+    document.querySelectorAll(".acc-button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const panel = document.getElementById(btn.getAttribute("aria-controls"));
+        const open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!open));
+        panel.classList.toggle("open", !open);
+      });
+    });
+
+    /* ---------- 4. SEARCH + CATEGORY FILTER ---------- */
+    const searchInput = document.getElementById("search");
+    const chips = document.querySelectorAll(".chip");
+    const cards = document.querySelectorAll(".card");
+    const faqItems = document.querySelectorAll(".acc-item");
+    let activeCat = "all";
+
+    function applyFilters() {
+      const q = searchInput.value.trim().toLowerCase();
+      let cardHits = 0, faqHits = 0;
+
+      cards.forEach((card) => {
+        const text = (card.textContent + " " + (card.dataset.keywords || "")).toLowerCase();
+        const show = (activeCat === "all" || card.dataset.cat === activeCat) && text.includes(q);
+        card.hidden = !show;
+        if (show) cardHits++;
+      });
+
+      faqItems.forEach((item) => {
+        const text = (item.textContent + " " + (item.dataset.keywords || "")).toLowerCase();
+        const show = !q || text.includes(q);   // category chips only affect topic cards
+        item.hidden = !show;
+        if (show) faqHits++;
+      });
+
+      document.getElementById("noResults").hidden = cardHits > 0;
+      document.getElementById("noFaq").hidden = faqHits > 0;
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        activeCat = chip.dataset.filter;
+        chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+        applyFilters();
+      });
+    });
+
+    /* ---------- 5. ANONYMOUS FEEDBACK ----------
+       Demo only: nothing is sent. To go live, POST to a privacy-respecting
+       endpoint that does NOT log IP addresses, and keep the form free of
+       name/email fields. */
+    document.getElementById("feedbackForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      // TODO: fetch("YOUR_ANONYMOUS_ENDPOINT", { method: "POST", body: ..., referrerPolicy: "no-referrer" });
+      e.target.reset();
+      document.getElementById("formStatus").textContent = "Thank you! Your message was received.";
+    });
+  </script>
+</body>
+</html>
